@@ -4,6 +4,7 @@ import numpy as np
 from keras.layers import Flatten, Dense
 from keras.models import Sequential
 from keras.layers.core import Lambda
+from keras.layers import Convolution2D, MaxPooling2D
 
 # read in the data csv file
 lines = []
@@ -32,8 +33,14 @@ print(X_train.shape, y_train.shape)
 input_shape = X_train.shape[1:]
 
 model = Sequential()
-model.add(Lambda(lambda x: x/255.0 - 0.5, input_shape=input_shape))
+model.add(Lambda(lambda x: (x - 128.)/128., input_shape=input_shape))
+model.add(Convolution2D(6, 5, 5, activation='relu'))
+model.add(MaxPooling2D())
+model.add(Convolution2D(16, 5, 5, activation='relu'))
+model.add(MaxPooling2D())
 model.add(Flatten())
+model.add(Dense(120, activation='relu')
+model.add(Dense(84, activation='relu')
 model.add(Dense(1))
 
 model.compile(optimizer='adam', loss='mse')
