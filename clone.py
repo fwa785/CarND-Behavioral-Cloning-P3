@@ -13,17 +13,26 @@ with open('data/driving_log.csv') as csvfile:
     for line in reader:
         lines.append(line)
 
+#correction
+correction = 0.2
+
 #load the images
 images = []
 measurements = []
 for line in lines[1:]:
-    source_path = line[0]
-    filename = source_path.split('/')[-1]
-    current_path = 'data/IMG/' + filename
-    image = cv2.imread(current_path)
-    images.append(image)
+    for i in range(3):
+        source_path = line[i]
+        filename = source_path.split('/')[-1]
+        current_path = 'data/IMG/' + filename
+        image = cv2.imread(current_path)
+        images.append(image)
     measurement = float(line[3])
+    #center image
     measurements.append(measurement)
+    #left image
+    measurements.append(measurement + correction)
+    #right image
+    measurements.append(measurement - correction)
 
 #augment the data with image flip
 augmented_images = []
@@ -35,9 +44,9 @@ for image, measurementy in zip(images, measurements):
     flipped_measurement = measurement * -1.0
     augmented_images.append(flipped_image)
     augmented_measurements.append(flipped_measurement)
-
+    
 X_train = np.array(augmented_images)
-y_train = np.array(augmented_measurements)
+y_train = np.array(augmened_measurements)
 
 print(X_train.shape, y_train.shape)
 
