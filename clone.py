@@ -1,8 +1,9 @@
 import csv
 import cv2
 import numpy as np
-from keras.layers import Flatten, Dense, Activation
+from keras.layers import Flatten, Dense
 from keras.models import Sequential
+from keras.layers.core import Lambda
 
 # read in the data csv file
 lines = []
@@ -31,7 +32,8 @@ print(X_train.shape, y_train.shape)
 input_shape = X_train.shape[1:]
 
 model = Sequential()
-model.add(Flatten(input_shape=input_shape))
+model.add(Lambda(lambda x: x/255.0 - 0.5, input_shape=input_shape))
+model.add(Flatten())
 model.add(Dense(1))
 
 model.compile(optimizer='adam', loss='mse')
