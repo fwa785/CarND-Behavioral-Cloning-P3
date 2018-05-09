@@ -25,8 +25,19 @@ for line in lines[1:]:
     measurement = float(line[3])
     measurements.append(measurement)
 
-X_train = np.array(images)
-y_train = np.array(measurements)
+#augment the data with image flip
+augmented_images = []
+augmented_measurements = []
+for image, measurementy in zip(images, measurements):
+    augmented_images.append(image)
+    augmented_measurements.append(measurement)
+    flipped_image = cv2.flip(image, 1)
+    flipped_measurement = measurement * -1.0
+    augmented_images.append(flipped_image)
+    augmented_measurements.append(flipped_measurement)
+
+X_train = np.array(augmented_images)
+y_train = np.array(augmented_measurements)
 
 print(X_train.shape, y_train.shape)
 
@@ -39,8 +50,8 @@ model.add(MaxPooling2D())
 model.add(Convolution2D(16, 5, 5, activation='relu'))
 model.add(MaxPooling2D())
 model.add(Flatten())
-model.add(Dense(120, activation='relu')
-model.add(Dense(84, activation='relu')
+model.add(Dense(120, activation='relu'))
+model.add(Dense(84, activation='relu'))
 model.add(Dense(1))
 
 model.compile(optimizer='adam', loss='mse')
