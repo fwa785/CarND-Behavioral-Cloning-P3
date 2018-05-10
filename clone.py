@@ -6,33 +6,40 @@ from keras.models import Sequential
 from keras.layers.core import Lambda
 from keras.layers import Convolution2D, MaxPooling2D, Cropping2D
 
-# read in the data csv file
-lines = []
-with open('data/driving_log.csv') as csvfile:
-    reader = csv.reader(csvfile)
-    for line in reader:
-        lines.append(line)
+images = []
+measurements = []
 
 #correction
 correction = 0.2
 
-#load the images
-images = []
-measurements = []
-for line in lines[1:]:
-    for i in range(3):
-        source_path = line[i]
-        filename = source_path.split('/')[-1]
-        current_path = 'data/IMG/' + filename
-        image = cv2.imread(current_path)
-        images.append(image)
-    measurement = float(line[3])
-    #center image
-    measurements.append(measurement)
-    #left image
-    measurements.append(measurement + correction)
-    #right image
-    measurements.append(measurement - 2 * correction)
+def load_data_from_dir(dirname):
+    # read in the data csv file
+    lines = []
+    with open(dirname + '/driving_log.csv') as csvfile:
+        reader = csv.reader(csvfile)
+        for line in reader:
+            lines.append(line)
+
+    #load the images
+    for line in lines[1:]:
+        for i in range(3):
+            source_path = line[i]
+            filename = source_path.split('/')[-1]
+            current_path = dirname+'/IMG/' + filename
+            image = cv2.imread(current_path)
+            images.append(image)
+        measurement = float(line[3])
+        #center image
+        measurements.append(measurement)
+        #left image
+        measurements.append(measurement + correction)
+        #right image
+        measurements.append(measurement - 2 * correction)
+
+#load data from data/ directory
+load_data_from_dir(data)
+#load data from data1/ directory
+load_data_from_dir(data1)
 
 #augment the data with image flip
 augmented_images = []
@@ -62,7 +69,7 @@ model.add(MaxPooling2D())
 model.add(Convolution2D(48, 5, 5, activation='relu'))
 model.add(MaxPooling2D())
 model.add(Convolution2D(64, 3, 3, activation='relu'))
-odel.add(Flatten())
+model.add(Flatten())
 model.add(Dense(100, activation='relu'))
 model.add(Dropout(p=0.5))
 model.add(Dense(50, activation='relu'))
