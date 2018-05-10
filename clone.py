@@ -27,6 +27,7 @@ def load_data_from_dir(dirname, seperator):
             filename = source_path.split(seperator)[-1]
             current_path = dirname+'/IMG/' + filename
             image = cv2.imread(current_path)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             images.append(image)
         measurement = float(line[3])
         #center image
@@ -39,7 +40,7 @@ def load_data_from_dir(dirname, seperator):
 #load data from data/ directory
 load_data_from_dir('data', '/')
 #load data from data1/ directory
-load_data_from_dir('data1', '\\')
+#load_data_from_dir('data1', '\\')
 
 #augment the data with image flip
 augmented_images = []
