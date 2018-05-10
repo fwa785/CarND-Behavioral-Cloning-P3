@@ -1,7 +1,7 @@
 import csv
 import cv2
 import numpy as np
-from keras.layers import Flatten, Dense
+from keras.layers import Flatten, Dense, Dropout
 from keras.models import Sequential
 from keras.layers.core import Lambda
 from keras.layers import Convolution2D, MaxPooling2D, Cropping2D
@@ -14,7 +14,7 @@ with open('data/driving_log.csv') as csvfile:
         lines.append(line)
 
 #correction
-correction = 0.2
+correction = 0.3
 
 #load the images
 images = []
@@ -61,7 +61,9 @@ model.add(Convolution2D(16, 5, 5, activation='relu'))
 model.add(MaxPooling2D())
 model.add(Flatten())
 model.add(Dense(120, activation='relu'))
+model.add(Dropout(p=0.5))
 model.add(Dense(84, activation='relu'))
+model.add(Dropout(p=0.5))
 model.add(Dense(1))
 
 model.compile(optimizer='adam', loss='mse')
