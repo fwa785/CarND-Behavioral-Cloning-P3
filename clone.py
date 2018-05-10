@@ -12,7 +12,7 @@ measurements = []
 #correction
 correction = 0.2
 
-def load_data_from_dir(dirname):
+def load_data_from_dir(dirname, seperator):
     # read in the data csv file
     lines = []
     with open(dirname + '/driving_log.csv') as csvfile:
@@ -24,7 +24,7 @@ def load_data_from_dir(dirname):
     for line in lines[1:]:
         for i in range(3):
             source_path = line[i]
-            filename = source_path.split('/')[-1]
+            filename = source_path.split(seperator)[-1]
             current_path = dirname+'/IMG/' + filename
             image = cv2.imread(current_path)
             images.append(image)
@@ -37,14 +37,14 @@ def load_data_from_dir(dirname):
         measurements.append(measurement - 2 * correction)
 
 #load data from data/ directory
-load_data_from_dir(data)
+load_data_from_dir('data', '/')
 #load data from data1/ directory
-load_data_from_dir(data1)
+load_data_from_dir('data1', '\\')
 
 #augment the data with image flip
 augmented_images = []
 augmented_measurements = []
-for image, measurementy in zip(images, measurements):
+for image, measurement in zip(images, measurements):
     augmented_images.append(image)
     augmented_measurements.append(measurement)
     flipped_image = cv2.flip(image, 1)
