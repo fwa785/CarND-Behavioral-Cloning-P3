@@ -14,7 +14,7 @@ with open('data/driving_log.csv') as csvfile:
         lines.append(line)
 
 #correction
-correction = 0.3
+correction = 0.2
 
 #load the images
 images = []
@@ -32,7 +32,7 @@ for line in lines[1:]:
     #left image
     measurements.append(measurement + correction)
     #right image
-    measurements.append(measurement - correction)
+    measurements.append(measurement - 2 * correction)
 
 #augment the data with image flip
 augmented_images = []
@@ -55,14 +55,19 @@ input_shape = X_train.shape[1:]
 model = Sequential()
 model.add(Lambda(lambda x: (x - 128.)/128., input_shape=input_shape))
 model.add(Cropping2D(cropping=((70,25), (0,0))))
-model.add(Convolution2D(6, 5, 5, activation='relu'))
+model.add(Convolution2D(24, 5, 5, activation='relu'))
 model.add(MaxPooling2D())
-model.add(Convolution2D(16, 5, 5, activation='relu'))
+model.add(Convolution2D(36, 5, 5, activation='relu'))
 model.add(MaxPooling2D())
-model.add(Flatten())
-model.add(Dense(120, activation='relu'))
+model.add(Convolution2D(48, 5, 5, activation='relu'))
+model.add(MaxPooling2D())
+model.add(Convolution2D(64, 3, 3, activation='relu'))
+odel.add(Flatten())
+model.add(Dense(100, activation='relu'))
 model.add(Dropout(p=0.5))
-model.add(Dense(84, activation='relu'))
+model.add(Dense(50, activation='relu'))
+model.add(Dropout(p=0.5))
+model.add(Dense(10, activation='relu'))
 model.add(Dropout(p=0.5))
 model.add(Dense(1))
 
