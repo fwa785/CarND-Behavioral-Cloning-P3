@@ -1,3 +1,4 @@
+import argparse
 import csv
 import cv2
 import numpy as np
@@ -71,34 +72,49 @@ def generator(dirname, lines, batch_size=32):
             y_train = np.array(augmented_measurements)
             yield sklearn.utils.shuffle(X_train, y_train)
 
-#load data from data directory
-dirname = 'track2_data2'
-train_lines, validation_lines, input_shape = load_csv_lines_from_dir(dirname)
+def train_model(dirname, model_filename):
+    #load data from data directory
+    train_lines, validation_lines, input_shape = load_csv_lines_from_dir(dirname)
 
-# compile and train the model using the generator function
-train_generator = generator(dirname, train_lines, batch_size=32)
-validation_generator = generator(dirname, validation_lines, batch_size=32)
+    # compile and train the model using the generator function
+    train_generator = generator(dirname, train_lines, batch_size=32)
+    validation_generator = generator(dirname, validation_lines, batch_size=32)
 
-model = Sequential()
-model.add(Lambda(lambda x: (x - 128.)/128., input_shape=input_shape))
-model.add(Cropping2D(cropping=((70,25), (0,0))))
-model.add(Convolution2D(24, 5, 5, subsample=(2,2), activation='relu'))
-model.add(Convolution2D(36, 5, 5, subsample=(2,2), activation='relu'))
-model.add(Convolution2D(48, 5, 5, subsample=(2,2), activation='relu'))
-model.add(Convolution2D(64, 3, 3, activation='relu'))
-model.add(Convolution2D(64, 3, 3, activation='relu'))
-model.add(Flatten())
-model.add(Dense(100, activation='relu'))
-model.add(Dropout(p=0.5))
-model.add(Dense(50, activation='relu'))
-model.add(Dropout(p=0.5))
-model.add(Dense(10, activation='relu'))
-model.add(Dropout(p=0.5))
-model.add(Dense(1))
+    model = Sequential()
+    model.add(Lambda(lambda x: (x - 128.)/128., input_shape=input_shape))
+    model.add(Cropping2D(cropping=((70,25), (0,0))))
+    model.add(Convolution2D(24, 5, 5, subsample=(2,2), activation='relu'))
+    model.add(Convolution2D(36, 5, 5, subsample=(2,2), activation='relu'))
+    model.add(Convolution2D(48, 5, 5, subsample=(2,2), activation='relu'))
+    model.add(Convolution2D(64, 3, 3, activation='relu'))
+    model.add(Convolution2D(64, 3, 3, activation='relu'))
+    model.add(Flatten())
+    model.add(Dense(100, activation='relu'))
+    model.add(Dense(50, activation='relu'))
+    model.add(Dense(10, activation='relu'))
+    model.add(Dense(1))
 
-model.compile(optimizer='adam', loss='mse')
-model.fit_generator(train_generator,samples_per_epoch=len(train_lines),
-                    validation_data=validation_generator,
-                    nb_val_samples=len(validation_lines), nb_epoch=7)
+    model.compile(optimizer='adam', loss='mse')
+    model.fit_generator(train_generator,samples_per_epoch=len(train_lines) * 6,
+                        validation_data=validation_generator,
+                        nb_val_samples=len(validation_lines), nb_epoch=7)
 
-model.save('model.h5')
+    model.save(model_filename)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Model Driving')
+    parser.add_argument(
+        'data_dir',
+        type=str,
+        help='The directory to load the data'
+    )
+
+    parser.add_argument(
+        'model_name',
+        type=str,
+        help='The saved filename of the model'
+    )
+
+    args = parser.parse_args()
+
+    train_model(args.data_dir, args.model_name)
