@@ -97,7 +97,7 @@ def train_model(dirname, model_filename):
     model.compile(optimizer='adam', loss='mse')
     model.fit_generator(train_generator,samples_per_epoch=len(train_lines) * 6,
                         validation_data=validation_generator,
-                        nb_val_samples=len(validation_lines), nb_epoch=7)
+                        nb_val_samples=len(validation_lines) * 6, nb_epoch=7)
 
     model.save(model_filename)
 
