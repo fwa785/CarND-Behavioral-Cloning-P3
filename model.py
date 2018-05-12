@@ -60,7 +60,7 @@ def generator(dirname, lines, batch_size=32):
                 # left image add turn right steering correction
                 measurements.append(measurement + correction)
                 # right image add turn left steering correction
-                measurements.append(measurement - 2 * correction)
+                measurements.append(measurement - correction)
 
             # augmented the data by flipping the images
             augmented_images = []
@@ -81,6 +81,10 @@ def generator(dirname, lines, batch_size=32):
 def train_model(dirname, model_filename):
     #load data from data directory
     train_lines, validation_lines, input_shape = load_csv_lines_from_dir(dirname)
+
+    print(input_shape)
+
+    return
 
     # compile and train the model using the generator function
     train_generator = generator(dirname, train_lines, batch_size=32)
